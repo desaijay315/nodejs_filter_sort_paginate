@@ -18,10 +18,30 @@ router.post('/posts',authenticate, async (req,res) => {
     }
 })
 
-router.get('/posts',async (req,res) => {
+router.get('/posts',authenticate, async (req,res) => {
+    //const _ispublished = req.query.published;
+    const match = {}
+    const sort  = {}
+
+    if(req.query.published){
+        match.published = req.query.published === 'true'
+    }
+
+    if(req.query.sortBy && req.query.OrderBy){
+        sort[req.query.sortBy]   = req.query.OrderBy === 'desc' ? -1 : 1
+    }
+    
     try {
-        const posts = await Post.find({})
-        res.send(posts)
+        await req.user.populate({
+            path:'posts',
+            match,
+            options:{
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip),
+                sort
+            }
+        }).execPopulate()
+        res.send(req.user.posts)
     } catch (error) {
         res.status(500).send()
     }

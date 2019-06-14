@@ -12,15 +12,14 @@ const PostSchema  = new mongoose.Schema({
         required:true,
         trim: true
     },
+    published: Boolean,
     author:{
         type: mongoose.Schema.Types.ObjectId,
         required:true,
         ref:'User'
-    },
-    createdAt:{
-        type: Date,
-        default: Date.now
     }
+},{
+    timestamps: true
 });
 
 PostSchema.virtual('comments', {
